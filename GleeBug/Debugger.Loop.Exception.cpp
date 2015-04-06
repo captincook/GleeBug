@@ -1,9 +1,15 @@
 #include "Debugger.h"
+#include "Debugger.Breakpoints.h"
+#include "Debugger.Global.h"
 
 namespace GleeBug
 {
 	void Debugger::exceptionBreakpoint(const EXCEPTION_RECORD & exceptionRecord, const bool firstChance)
 	{
+		unsigned char bp_type = 0;
+		breakpoint trigger_bp = breakpoint();
+
+
 		if (!_curProcess->systemBreakpoint) //handle system breakpoint
 		{
 			_curProcess->systemBreakpoint = true;
@@ -14,7 +20,24 @@ namespace GleeBug
 		}
 		else //handle other breakpoint exceptions
 		{
+			
+			
+			
+			ReadProcessMemory(_curProcess->hProcess, exceptionRecord.ExceptionAddress, &bp_type, 1, NULL);
+			
+			printf("The breakpoint ocurred at location %X and the bp type is %X", exceptionRecord.ExceptionAddress, bp_type);
+			breakpoint_id bp_id = breakpoint_id((uint32_t)exceptionRecord.ExceptionAddress, bp_type);
+			try{
+				trigger_bp = _curProcess->bpManager.at(bp_id);
+			}
+			catch (std::out_of_range & oor){
+				return;
+			}
+			
+		
+			cbOnUserBreakPointTrigger(trigger_bp);
 		}
+
 	}
 
 	void Debugger::exceptionSingleStep(const EXCEPTION_RECORD & exceptionRecord, const bool firstChance)

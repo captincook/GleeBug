@@ -189,8 +189,13 @@ namespace GleeBug
 		*/
 		virtual void exceptionSingleStep(const EXCEPTION_RECORD & exceptionRecord, const bool firstChance);
 
+		/*
+		A Breakpoint placed by user actually triggers.
+		*/
+		virtual void cbOnUserBreakPointTrigger(breakpoint bp){};
+
 	protected: //variables
-		BreakPointManager _breakPoints;
+
 		PROCESS_INFORMATION _mainProcess;
 		DWORD _continueStatus;
 		bool _breakDebugger;

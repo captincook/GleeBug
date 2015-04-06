@@ -4,6 +4,7 @@
 #include "Debugger.Global.h"
 #include "Debugger.Thread.h"
 #include "Debugger.Dll.h"
+#include "Debugger.Breakpoints.h"
 
 namespace GleeBug
 {
@@ -12,6 +13,7 @@ namespace GleeBug
 	*/
 	struct ProcessInfo
 	{
+		bpmap_addrbp_bp bpManager;
 		HANDLE hProcess;
 		DWORD dwProcessId;
 		DWORD dwMainThreadId;
@@ -21,6 +23,9 @@ namespace GleeBug
 
 		ThreadMap threads;
 		DllMap dlls;
+
+		bool AddBreakpoint(LPVOID address, uint32_t type);
+		bool DelBreakpoint(LPVOID address, uint32_t type);
 
 		ProcessInfo();
 		ProcessInfo(DWORD dwProcessId, DWORD dwMainThreadId);

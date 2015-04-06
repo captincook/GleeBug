@@ -11,6 +11,20 @@ protected:
 	virtual void cbCreateProcessEvent(const CREATE_PROCESS_DEBUG_INFO & createProcess, const ProcessInfo & process)
 	{
 		printf("Process %d created with entry 0x%p\n", _debugEvent.dwProcessId, createProcess.lpStartAddress);
+		if (SetBreakPointMainProcess((LPVOID)0x0406C35, SOFT_BP) == false)
+		{
+			printf("wtf failed");
+		}
+	};
+
+	virtual void cbOnUserBreakPointTrigger(breakpoint bp){
+		
+		printf("wtf!?");
+		if (bp.bp_address == (LPVOID)0x00406C35)
+		{
+			printf("ho noes, a few bytes further of the entry point!");
+		}
+	
 	};
 
 	virtual void cbExitProcessEvent(const EXIT_PROCESS_DEBUG_INFO & exitProcess, const ProcessInfo & process)
