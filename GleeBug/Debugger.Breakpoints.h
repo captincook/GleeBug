@@ -2,7 +2,7 @@
 #define DEBUGGER_BREAKPOINTS_H
 
 #include "Debugger.Global.h"
-
+#include "Debugger.Breakpoints.Types.h"
 
 /*
 Incomplete Job. I'll Continue Later. 
@@ -18,7 +18,7 @@ namespace GleeBug{
 
 		
 		uint32_t bp_type;
-		LPVOID bp_address;
+		ULONG_PTR bp_address;
 		uint8_t original_opcode;
 		bool enabled;
 	
@@ -29,7 +29,7 @@ namespace GleeBug{
 			original_opcode = NULL;
 			enabled = false;
 		}
-		breakpoint(HANDLE hProcess, LPVOID _address, uint32_t _bp_type)
+		breakpoint(HANDLE hProcess, ULONG_PTR _address, uint32_t _bp_type)
 		{
 			SIZE_T nbytes_written = 0;
 			bp_address = _address;
@@ -47,9 +47,9 @@ namespace GleeBug{
 				break;
 			}
 
-			if(ReadProcessMemory(hProcess, bp_address, &original_opcode, 1, &nbytes_written) == 0)
+			if(ReadProcessMemory(hProcess, (const void*)bp_address, &original_opcode, 1, &nbytes_written) == 0)
 			{
-				printf("Cant Read Process at %X\n an the process handle is %X", bp_address, hProcess);
+				printf("Cant Read Process at %X\n an the process handle is %p", bp_address, hProcess);
 				enabled = false;
 			}
 
@@ -59,7 +59,7 @@ namespace GleeBug{
 			}
 
 
-			if (WriteProcessMemory(hProcess, bp_address, &bp_type, 1, &nbytes_written) == 0)
+			if (WriteProcessMemory(hProcess, (void*)bp_address, &bp_type, 1, &nbytes_written) == 0)
 			{
 				printf("could not Write the process\n");
 				enabled= false;
@@ -80,7 +80,7 @@ namespace GleeBug{
 			
 			SIZE_T nbytes_written = 0;
 			
-			if (WriteProcessMemory(hProcess, bp_address, &original_opcode, 1, &nbytes_written)==0)
+			if (WriteProcessMemory(hProcess, (void*)bp_address, &original_opcode, 1, &nbytes_written)==0)
 			{
 				return false;
 			}
@@ -102,7 +102,7 @@ namespace GleeBug{
 			return bp_type;
 		}
 
-		LPVOID GetAddress(){
+		ULONG_PTR GetAddress(){
 			return bp_address;
 		}
 
@@ -116,7 +116,7 @@ namespace GleeBug{
 
 		uint32_t operator()(breakpoint_id bpid){
 			std::hash<uint32_t> hasher;
-			return hasher(std::get<0>(bpid)) ^ hasher(std::get<1>(bpid));
+			return (uint32_t)hasher(std::get<0>(bpid)) ^ (uint32_t)hasher(std::get<1>(bpid));
 		}
 	};
 

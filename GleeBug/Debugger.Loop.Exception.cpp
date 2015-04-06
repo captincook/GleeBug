@@ -10,9 +10,9 @@ namespace GleeBug
 		breakpoint trigger_bp = breakpoint();
 
 
-		if (!_curProcess->systemBreakpoint) //handle system breakpoint
+		if (!_process->systemBreakpoint) //handle system breakpoint
 		{
-			_curProcess->systemBreakpoint = true;
+			_process->systemBreakpoint = true;
 			_continueStatus = DBG_CONTINUE;
 
 			//call the callback
@@ -23,12 +23,12 @@ namespace GleeBug
 			
 			
 			
-			ReadProcessMemory(_curProcess->hProcess, exceptionRecord.ExceptionAddress, &bp_type, 1, NULL);
+			ReadProcessMemory(_process->hProcess, exceptionRecord.ExceptionAddress, &bp_type, 1, NULL);
 			
-			printf("The breakpoint ocurred at location %X and the bp type is %X", exceptionRecord.ExceptionAddress, bp_type);
+			printf("The breakpoint ocurred at location %p and the bp type is %X\n", exceptionRecord.ExceptionAddress, bp_type);
 			breakpoint_id bp_id = breakpoint_id((uint32_t)exceptionRecord.ExceptionAddress, bp_type);
 			try{
-				trigger_bp = _curProcess->bpManager.at(bp_id);
+				trigger_bp = _process->bpManager.at(bp_id);
 			}
 			catch (std::out_of_range & oor){
 				return;
@@ -42,6 +42,21 @@ namespace GleeBug
 
 	void Debugger::exceptionSingleStep(const EXCEPTION_RECORD & exceptionRecord, const bool firstChance)
 	{
+		if (_thread->isSingleStepping) //handle single step
+		{
+			_thread->isSingleStepping = false;
+			_continueStatus = DBG_CONTINUE;
+
+			//call the callbacks
+			StepCallbackVector cbStepCopy = _thread->stepCallbacks;
+			_thread->stepCallbacks.clear();
+			for (auto cbStep : cbStepCopy)
+				cbStep();
+			cbStep();			
+		}
+		else //handle other single step exceptions
+		{
+		}
 	}
 
 	void Debugger::exceptionEvent(const EXCEPTION_DEBUG_INFO & exceptionInfo)

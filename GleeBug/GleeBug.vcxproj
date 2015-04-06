@@ -157,15 +157,17 @@
     <ClCompile Include="Debugger.Loop.Thread.cpp" />
     <ClCompile Include="Debugger.Process.cpp" />
     <ClCompile Include="Debugger.Thread.cpp" />
+    <ClCompile Include="Debugger.Thread.Registers.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Debugger.Breakpoint.Types.h" />
     <ClInclude Include="Debugger.Breakpoints.h" />
+    <ClInclude Include="Debugger.Breakpoints.Types.h" />
     <ClInclude Include="Debugger.Dll.h" />
     <ClInclude Include="Debugger.Process.h" />
     <ClInclude Include="Debugger.h" />
     <ClInclude Include="Debugger.Thread.h" />
     <ClInclude Include="Debugger.Global.h" />
+    <ClInclude Include="Debugger.Thread.Registers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

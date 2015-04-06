@@ -3,7 +3,6 @@
 
 #include "Debugger.Global.h"
 #include "Debugger.Process.h"
-#include "Debugger.Breakpoints.h"
 
 namespace GleeBug
 {
@@ -46,11 +45,6 @@ namespace GleeBug
 		*/
 		void Start();
 
-		/*
-		adds a brakpoint on the main process being debugger;
-		*/
-		bool SetBreakPointMainProcess(LPVOID address, uint32_t bp_type);
-		bool DelBreakPointMainProcess(LPVOID address, uint32_t bp_type);
 	protected: //debug event callbacks
 		/**
 		\brief Process creation debug event callback. Provide an implementation to use this callback.
@@ -108,6 +102,12 @@ namespace GleeBug
 
 	protected: //other callbacks
 		/**
+		\brief Internal error callback. Provide an implementation to use this callback.
+		\param error The error message.
+		*/
+		virtual void cbInternalError(const std::string & error) {};
+
+		/**
 		\brief Unhandled exception callback. Provide an implementation to use this callback.
 		\param exceptionRecord The exception record.
 		\param firstChance True if the exception is a first chance exception, false otherwise.
@@ -118,6 +118,11 @@ namespace GleeBug
 		\brief System breakpoint callback. Provide an implementation to use this callback.
 		*/
 		virtual void cbSystemBreakpoint() {};
+
+		/**
+		\brief Step callback. Provide an implementation to use this callback.
+		*/
+		virtual void cbStep() {};
 
 	protected: //core debug event handlers
 		/**
@@ -195,14 +200,22 @@ namespace GleeBug
 		virtual void cbOnUserBreakPointTrigger(breakpoint bp){};
 
 	protected: //variables
-
 		PROCESS_INFORMATION _mainProcess;
 		DWORD _continueStatus;
 		bool _breakDebugger;
 		DEBUG_EVENT _debugEvent;
 		ProcessMap _processes;
-		ProcessInfo* _curProcess;
 		bool _isRunning;
+
+		/**
+		\brief The current process (can be null in some cases).
+		*/
+		ProcessInfo* _process;
+
+		/**
+		\brief The current thread (can be null in some cases). Should be a copy of _process->thread.
+		*/
+		ThreadInfo* _thread;
 	};
 };
 

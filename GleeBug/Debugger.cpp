@@ -11,8 +11,7 @@ namespace GleeBug
 		const wchar_t* szCommandLine,
 		const wchar_t* szCurrentDirectory)
 	{
-		
-
+		//_breakPoints = BreakPointManager();
 		STARTUPINFOW si;
 		memset(&si, 0, sizeof(si));
 		const wchar_t* szFileNameCreateProcess;
@@ -51,18 +50,4 @@ namespace GleeBug
 	{
 		return !!DebugActiveProcessStop(_mainProcess.dwProcessId);
 	}
-
-	bool Debugger::SetBreakPointMainProcess(LPVOID address, uint32_t bp_type){
-		breakpoint new_bp = breakpoint(_curProcess->hProcess, address, bp_type);
-		breakpoint_id new_id = breakpoint_id((uint32_t)address, bp_type);
-		return new_bp.enabled;
-	}
-	bool Debugger::DelBreakPointMainProcess(LPVOID address, uint32_t bp_type){
-		breakpoint_id new_id = breakpoint_id((uint32_t)address, bp_type);
-		breakpoint bp_del = _curProcess->bpManager[new_id];
-		bp_del.DeleteBP(_curProcess->hProcess);
-		_curProcess->bpManager.erase(new_id);
-		return true;
-	}
-
 };

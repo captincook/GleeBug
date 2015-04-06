@@ -3,13 +3,15 @@
 
 #include <cstdio>
 #include <string>
+#include <stdint.h>
 #include <vector>
 #include <unordered_map>
 #include <map>
-#include <stdint.h>
+#include <set>
+#include <functional>
+
 #include <windows.h>
 #include <psapi.h>
-#include "Debugger.Breakpoint.Types.h"
 
 namespace GleeBug
 {
@@ -22,6 +24,26 @@ namespace GleeBug
 			return a.second < b.first;
 		}
 	};
+
+	//forward declarations
+	class Debugger;
+	class ProcessInfo;
+	class DllInfo;
+	class ThreadInfo;
+
+	//map typedefs
+	typedef std::map<DWORD, ProcessInfo> ProcessMap;
+	typedef std::map<Range, DllInfo, RangeCompare> DllMap;
+	typedef std::map<DWORD, ThreadInfo> ThreadMap;
+	
+	//callback function typedefs
+	typedef std::function<void()> StepCallback;
+
+	//vector typedefs
+	typedef std::vector<StepCallback> StepCallbackVector;
+
+	//macros
+	#define BIND(thisPtr, funcPtr) std::bind(&funcPtr, thisPtr)
 };
 
 #endif //_DEBUGGER_GLOBAL_H
